@@ -82,7 +82,13 @@ FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 @app.on_event("startup")
 def startup():
     init_db()
-    load_artifacts()
+    try:
+        load_artifacts()
+    except FileNotFoundError:
+        print("Data artifacts not found, running data pipeline...")
+        from .data_pipeline import run_pipeline
+        run_pipeline()
+        load_artifacts()
     print("🚀 Ascend API ready.")
 
 
