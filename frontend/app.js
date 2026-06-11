@@ -1105,6 +1105,11 @@
         btn.addEventListener('click', () => switchMobileView(btn.dataset.view));
     });
 
+    const $btnGotoTracks = document.getElementById('btn-goto-tracks');
+    if ($btnGotoTracks) {
+        $btnGotoTracks.addEventListener('click', () => switchMobileView('tracks'));
+    }
+
     // ── SAM Scales ─────────────────────────────────────────────────────────
 
     function initSAMScales() {

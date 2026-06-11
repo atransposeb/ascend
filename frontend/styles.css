@@ -744,6 +744,27 @@ body::before {
     color: var(--ink);
 }
 
+/* ── Go to Tracks button (mobile only) ───────────────────────────────── */
+.btn-goto-tracks {
+    display: none;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    min-height: var(--tap-min);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+.btn-goto-tracks:active {
+    opacity: 0.7;
+}
+
 /* VA Chart */
 .va-chart-wrap {
     width: 100%;
@@ -1835,6 +1856,9 @@ body::before {
         border: 1px solid var(--rule);
         border-bottom: none;
         min-height: 200px;
+    }
+    .btn-goto-tracks {
+        display: block;
     }
     .metrics-grid {
         grid-template-columns: 1fr;
