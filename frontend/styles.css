@@ -1804,12 +1804,11 @@ body::before {
 
     .dashboard-layout {
         flex-direction: column;
-        height: 100dvh;
     }
     .panel-left {
-        max-height: none;
-        flex: 1;
-        min-height: 0;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--rule-heavy);
     }
     .panel-tab-btn {
         font-size: clamp(0.45rem, 2vw, 0.55rem);
@@ -1826,14 +1825,16 @@ body::before {
     }
     .panel-tab {
         padding: 0.75rem;
+        overflow-y: visible;
         min-height: 0;
     }
 
     .va-chart-wrap {
-        max-height: none;
-        aspect-ratio: auto;
-        flex: 1;
-        min-height: 0;
+        width: 100%;
+        aspect-ratio: 1.5;
+        border: 1px solid var(--rule);
+        border-bottom: none;
+        min-height: 200px;
     }
     .metrics-grid {
         grid-template-columns: 1fr;
