@@ -500,7 +500,8 @@
         const rect  = $vaCanvas.getBoundingClientRect();
         const pad   = 30;
         const w     = rect.width;
-        return { rect, pad, w, plotW: w - pad * 2, plotH: w - pad * 2 };
+        const h     = rect.height;
+        return { rect, pad, w, plotW: w - pad * 2, plotH: h - pad * 2 };
     }
 
     function vaToScreenXY(v, a) {
@@ -633,7 +634,6 @@
 
     function renderDashboard() {
         renderTracklist();
-        renderVAChart();
         renderMetrics();
         initSAMScales();
         closePlayerPanel();
@@ -644,6 +644,7 @@
         samValues = { preV: null, preA: null, postV: null, postA: null };
         switchTab('chart');
         switchMobileView('chart');
+        renderVAChart();
     }
 
     function renderTracklist() {
@@ -810,11 +811,11 @@
         if (!$vaCanvas || !currentPlaylist) return;
         const dpr  = window.devicePixelRatio || 1;
         const rect = $vaCanvas.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return;
         const w    = rect.width;
-        const h    = rect.width;
+        const h    = rect.height;
         $vaCanvas.width  = w * dpr;
         $vaCanvas.height = h * dpr;
-        $vaCanvas.style.height = `${h}px`;
         const ctx  = $vaCanvas.getContext('2d');
         ctx.scale(dpr, dpr);
 
@@ -1097,6 +1098,7 @@
         toggleBtns.forEach(b => b.classList.toggle('active', b.dataset.view === view));
         $dashboardToggle.classList.remove('view-chart', 'view-tracks');
         $dashboardToggle.classList.add(`view-${view}`);
+        if (view === 'chart') requestAnimationFrame(renderVAChart);
     }
 
     toggleBtns.forEach(btn => {
