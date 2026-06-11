@@ -1,0 +1,17 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+venv/
+.venv/
+
+# Data files
+emotional_journey/data/
+
+# IDE
+.vscode/
+.idea/

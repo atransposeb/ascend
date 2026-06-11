@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ascend — An intelligent emotional navigation platform. Navigate from your current emotional state to your desired one through scientifically curated music sequences.">
+    <title>Ascend — Emotional Navigation Through Music</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>▲</text></svg>">
+</head>
+<body>
+
+<div class="app-root">
+
+    <!-- ══════════════════════════════════════════════════════════
+         LANDING SCREEN
+         ══════════════════════════════════════════════════════════ -->
+    <div class="screen active" id="screen-landing">
+        <header class="landing-header">
+            <div class="landing-wordmark">▲ ASCEND</div>
+        </header>
+
+        <main class="landing-main">
+            <div class="landing-hero">
+                <div class="landing-kicker">Continuous Emotional Navigation</div>
+                <h1 class="landing-title">Ascend</h1>
+                <p class="landing-description">
+                    A research-grade platform that navigates emotional states through music — not playlists, but curated trajectories through continuous Valence-Arousal space. Rather than static mood categories, Ascend maps your emotional journey as a mathematical path and selects tracks that guide you from where you are to where you want to be.
+                </p>
+                <div class="landing-pillars">
+                    <div class="pillar">
+                        <div class="pillar-label">WHAT IT DOES</div>
+                        <div class="pillar-text">Transitions your emotional state using music selected along a computed VA trajectory.</div>
+                    </div>
+                    <div class="pillar-divider"></div>
+                    <div class="pillar">
+                        <div class="pillar-label">HOW IT WORKS</div>
+                        <div class="pillar-text">Place your current and target mood on the dimensional plane. The engine generates a path and retrieves tracks via FAISS nearest-neighbor search.</div>
+                    </div>
+                    <div class="pillar-divider"></div>
+                    <div class="pillar">
+                        <div class="pillar-label">WHY IT'S DIFFERENT</div>
+                        <div class="pillar-text">No genre tags. No mood labels. Pure dimensional psychology — Valence, Arousal, and real-time adaptive personalisation.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Auth Buttons -->
+            <div class="auth-section">
+                <div class="auth-heading">Continue with</div>
+                <div class="auth-buttons">
+                    <button class="auth-btn auth-btn-spotify" data-provider="spotify">
+                        <span class="auth-btn-icon">♫</span>
+                        <span class="auth-btn-label">Spotify</span>
+                    </button>
+                    <button class="auth-btn auth-btn-google" data-provider="google">
+                        <span class="auth-btn-icon">G</span>
+                        <span class="auth-btn-label">Google</span>
+                    </button>
+                    <button class="auth-btn auth-btn-github" data-provider="github">
+                        <span class="auth-btn-icon">⌘</span>
+                        <span class="auth-btn-label">GitHub</span>
+                    </button>
+                </div>
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+                <button class="btn-guest" id="btn-guest">Continue as Guest →</button>
+            </div>
+
+            <div class="landing-cards">
+                <button class="mode-card active" id="card-linear" data-path="linear">
+                    <div class="card-index">01</div>
+                    <div class="card-title">Linear Chord</div>
+                    <div class="card-desc">Direct trajectory. Shortest path between emotional states. Efficient, purposeful.</div>
+                    <div class="card-select-indicator">SELECTED</div>
+                </button>
+                <button class="mode-card" id="card-creative" data-path="creative">
+                    <div class="card-index">02</div>
+                    <div class="card-title">Creative Arch</div>
+                    <div class="card-desc">Bezier arc. Gradual, immersive transition with emotional depth. Recommended.</div>
+                    <div class="card-select-indicator">SELECT</div>
+                </button>
+                <button class="mode-card" id="card-random" data-path="random">
+                    <div class="card-index">03</div>
+                    <div class="card-title">Exploration</div>
+                    <div class="card-desc">Stochastic perturbation. Discover unexpected transitions.</div>
+                    <div class="card-select-indicator">SELECT</div>
+                </button>
+            </div>
+        </main>
+
+        <footer class="landing-footer">
+            <span>▲ Ascend uses Valence-Arousal dimensional psychology, not mood labels.</span>
+            <a href="https://findahelpline.com/" target="_blank" rel="noopener">Not a therapeutic tool.</a>
+        </footer>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         MOOD SELECTION SCREEN
+         ══════════════════════════════════════════════════════════ -->
+    <div class="screen" id="screen-select">
+        <div class="select-layout">
+            <div class="select-sidebar">
+                <button class="back-btn" id="btn-back-landing">← Back</button>
+                <div class="select-brand">▲ ASCEND</div>
+                <div class="select-instruction">
+                    <div class="instruction-step" id="instruction-step">
+                        <span class="step-num">01</span>
+                        <span class="step-text">Click to place your <strong>current</strong> emotional state</span>
+                    </div>
+                </div>
+                <div class="coord-readout" id="coord-readout">
+                    <div class="coord-item" id="coord-start">
+                        <div class="coord-label">START</div>
+                        <div class="coord-val" id="coord-start-val">—</div>
+                    </div>
+                    <div class="coord-divider">→</div>
+                    <div class="coord-item" id="coord-target">
+                        <div class="coord-label">TARGET</div>
+                        <div class="coord-val" id="coord-target-val">—</div>
+                    </div>
+                </div>
+                <div class="settings-panel">
+                    <label class="setting-label">TRAJECTORY MODE</label>
+                    <div class="path-mode-display" id="path-mode-display">Linear Chord</div>
+                </div>
+                <button class="btn-generate" id="btn-generate" disabled>
+                    Generate Journey →
+                </button>
+            </div>
+
+            <div class="canvas-area">
+                <div class="axis-labels">
+                    <span class="axis-top">HIGH ENERGY ↑</span>
+                    <span class="axis-bottom">↓ LOW ENERGY</span>
+                    <span class="axis-left">← NEGATIVE</span>
+                    <span class="axis-right">POSITIVE →</span>
+                </div>
+                <canvas id="mood-selector-canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         DASHBOARD SCREEN — Two-Panel
+         ══════════════════════════════════════════════════════════ -->
+    <div class="screen" id="screen-dashboard">
+        <div class="dashboard-layout">
+
+            <!-- ── Mobile view toggle (hidden on desktop) ── -->
+            <div class="dashboard-toggle" id="dashboard-toggle">
+                <button class="toggle-btn active" data-view="chart">Chart</button>
+                <button class="toggle-btn" data-view="tracks">Tracks</button>
+            </div>
+
+            <!-- ── Left Panel: Controls + Chart ── -->
+            <div class="panel panel-left" id="panel-left">
+                <div class="panel-header">
+                    <div class="panel-nav-row">
+                        <button class="back-btn" id="btn-back-select">← New Journey</button>
+                        <div class="panel-brand">▲ ASCEND</div>
+                        <div class="user-profile" id="user-profile">
+                            <img class="user-avatar" id="user-avatar" src="" alt="" style="display:none">
+                            <span class="user-name" id="user-name"></span>
+                            <button class="btn-signout" id="btn-signout" style="display:none">Sign Out</button>
+                        </div>
+                    </div>
+                    <div class="panel-tabs-row">
+                        <button class="panel-tab-btn active" id="tab-chart" data-tab="chart">Chart</button>
+                        <button class="panel-tab-btn" id="tab-metrics" data-tab="metrics">Metrics</button>
+                        <button class="panel-tab-btn" id="tab-feedback" data-tab="feedback">Feedback</button>
+                        <button class="panel-tab-btn" id="tab-history" data-tab="history">History</button>
+                    </div>
+                </div>
+
+                <!-- Tab: Chart -->
+                <div class="panel-tab active" id="tab-content-chart">
+                    <div class="va-chart-wrap">
+                        <canvas id="va-canvas"></canvas>
+                    </div>
+                    <div class="chart-drag-hint" id="chart-drag-hint">↕ Drag waypoint handles to reshape trajectory</div>
+                    <div class="chart-legend">
+                        <span class="legend-item"><span class="legend-sq solid"></span> Track</span>
+                        <span class="legend-item"><span class="legend-sq dashed"></span> Waypoint path</span>
+                        <span class="legend-item"><span class="legend-sq wp-handle"></span> Drag handle</span>
+                    </div>
+                </div>
+
+                <!-- Tab: Metrics -->
+                <div class="panel-tab" id="tab-content-metrics">
+                    <div class="metrics-grid" id="metrics-grid"></div>
+                    <div class="metrics-explainer">
+                        <p><strong>Endpoint Accuracy</strong> — Distance of final track from target state (lower = better)</p>
+                        <p><strong>Smoothness</strong> — Mean step size between consecutive tracks in VA space</p>
+                        <p><strong>Max Jump</strong> — Largest single emotional leap in the sequence</p>
+                        <p><strong>ISO Compliance</strong> — First track within 0.20 of the start state</p>
+                        <p><strong>Genre Entropy</strong> — Diversity of genres (higher = more varied)</p>
+                    </div>
+                </div>
+
+                <!-- Tab: History -->
+                <div class="panel-tab" id="tab-content-history">
+                    <div class="history-pane" id="history-pane">
+                        <div class="history-empty" id="history-empty">
+                            <div class="history-empty-icon">◈</div>
+                            <div class="history-empty-text">No saved journeys yet</div>
+                            <div class="history-empty-sub">Generate a playlist and click <strong>Save</strong> to store it here</div>
+                        </div>
+                        <div class="history-list" id="history-list"></div>
+                    </div>
+                </div>
+
+                <!-- Tab: Feedback -->
+                <div class="panel-tab" id="tab-content-feedback">
+                    <div class="feedback-pane">
+                        <h3 class="feedback-heading">Post-Session Self-Report</h3>
+                        <p class="feedback-sub">Rate your emotional state before and after listening. This data drives adaptive personalisation.</p>
+                        <div class="sam-group">
+                            <label>Before — Positivity (Valence)</label>
+                            <div class="sam-scale" id="sam-pre-valence"></div>
+                            <div class="sam-endpoints"><span>Very Negative</span><span>Very Positive</span></div>
+                        </div>
+                        <div class="sam-group">
+                            <label>Before — Energy (Arousal)</label>
+                            <div class="sam-scale" id="sam-pre-arousal"></div>
+                            <div class="sam-endpoints"><span>Very Calm</span><span>Very Energised</span></div>
+                        </div>
+                        <div class="sam-group">
+                            <label>After — Positivity (Valence)</label>
+                            <div class="sam-scale" id="sam-post-valence"></div>
+                            <div class="sam-endpoints"><span>Very Negative</span><span>Very Positive</span></div>
+                        </div>
+                        <div class="sam-group">
+                            <label>After — Energy (Arousal)</label>
+                            <div class="sam-scale" id="sam-post-arousal"></div>
+                            <div class="sam-endpoints"><span>Very Calm</span><span>Very Energised</span></div>
+                        </div>
+                        <div class="feedback-actions">
+                            <button class="btn-outline" id="btn-skip-feedback">Skip</button>
+                            <button class="btn-solid" id="btn-submit-feedback">Submit →</button>
+                        </div>
+                        <div class="feedback-result" id="feedback-result">
+                            <div class="result-title">Calibration recorded.</div>
+                            <div class="result-deltas" id="result-deltas"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Right Panel: Tracklist + Spotify Player ── -->
+            <div class="panel panel-right" id="panel-right">
+                <div class="tracklist-header" id="tracklist-header">
+                    <div class="journey-label" id="journey-label">Emotional Journey</div>
+                    <button class="btn-save-journey" id="btn-save-journey" title="Save this journey">Save</button>
+                    <div class="track-count" id="track-count"></div>
+                </div>
+
+                <div class="tracklist-scroll" id="tracklist-scroll">
+                    <div id="tracklist"></div>
+                </div>
+            </div>
+
+            <!-- ── Floating Spotify Player Panel ── -->
+            <div class="player-floating" id="player-floating">
+                <div class="player-floating-header">
+                    <span class="player-floating-label">NOW PLAYING</span>
+                    <span class="player-floating-track" id="player-floating-track">—</span>
+                    <button class="player-floating-close" id="player-floating-close">✕</button>
+                </div>
+                <div class="player-floating-embed" id="player-floating-embed">
+                    <div class="player-floating-placeholder" id="player-floating-placeholder">
+                        <div class="player-floating-placeholder-icon">♫</div>
+                        <div class="player-floating-placeholder-text">Select a track to preview</div>
+                    </div>
+                    <iframe
+                        id="player-floating-iframe"
+                        src=""
+                        width="100%"
+                        height="100%"
+                        frameborder="0"
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy"
+                        style="display:none;"
+                    ></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading overlay -->
+<div class="loader-overlay" id="loader">
+    <div class="loader-inner">
+        <div class="loader-triangle">▲</div>
+        <div class="loader-text">Plotting your trajectory…</div>
+    </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
