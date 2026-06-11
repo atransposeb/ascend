@@ -432,7 +432,7 @@ body::before {
 }
 
 .select-sidebar {
-    width: 280px;
+    width: 300px;
     flex-shrink: 0;
     border-right: 1px solid var(--rule-heavy);
     padding: 2rem 1.75rem;
