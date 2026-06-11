@@ -10,7 +10,7 @@ venv/
 .venv/
 
 # Data files
-emotional_journey/data/
+data/
 
 # IDE
 .vscode/

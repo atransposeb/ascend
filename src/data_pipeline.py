@@ -19,9 +19,9 @@ import pandas as pd
 
 # ── Paths ───────────────────────────────────────────────────────────────────
 
-ROOT_DIR = Path(__file__).resolve().parent.parent          # emotional_journey/
+ROOT_DIR = Path(__file__).resolve().parent.parent          # repo root
 DATA_DIR = ROOT_DIR / "data"
-DATASET_PATH = ROOT_DIR.parent / "dataset.csv"             # ascend/dataset.csv
+DATASET_PATH = ROOT_DIR / "dataset.csv"
 
 
 # ── Feature columns we keep ─────────────────────────────────────────────────
