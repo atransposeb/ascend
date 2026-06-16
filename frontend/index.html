@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Ascend — An intelligent emotional navigation platform. Navigate from your current emotional state to your desired one through scientifically curated music sequences.">
+    <meta name="description" content="Ascend — Navigate your emotions through music.">
     <title>Ascend — Emotional Navigation Through Music</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,123 +15,140 @@
 
 <div class="app-root">
 
-    <!-- ══════════════════════════════════════════════════════════
-         LANDING SCREEN
-         ══════════════════════════════════════════════════════════ -->
+    <!-- ════════════════════════════════════════
+         LANDING
+         ════════════════════════════════════════ -->
     <div class="screen active" id="screen-landing">
-        <header class="landing-header">
-            <div class="landing-wordmark">▲ ASCEND</div>
+        <header class="top-bar">
+            <span class="top-bar-wordmark">▲ ASCEND</span>
         </header>
 
-        <main class="landing-main">
-            <div class="landing-hero">
-                <div class="landing-kicker">Continuous Emotional Navigation</div>
-                <h1 class="landing-title">Ascend</h1>
-                <p class="landing-description">
-                    Music is deeply tied to how we feel — and that connection is more than just mood. Grounded in <a href="https://www.researchgate.net/publication/235361517_A_circumplex_model_of_affect" target="_blank" rel="noopener noreferrer">decades of affective science</a>, Ascend maps emotions not as simple labels, but as coordinates in a continuous space. It then finds music that can gently guide you from one emotional place to another — wherever you want to go.
-                </p>
-                <div class="landing-pillars">
-                    <div class="pillar">
-                        <div class="pillar-label">WHAT IT DOES</div>
-                        <div class="pillar-text">Transitions your emotional state using music selected along a computed VA trajectory.</div>
-                    </div>
-                    <div class="pillar-divider"></div>
-                    <div class="pillar">
-                        <div class="pillar-label">HOW IT WORKS</div>
-                        <div class="pillar-text">Place your current and target mood on the dimensional plane. The engine generates a path and retrieves tracks via FAISS nearest-neighbor search.</div>
-                    </div>
-                    <div class="pillar-divider"></div>
-                    <div class="pillar">
-                        <div class="pillar-label">WHY IT'S DIFFERENT</div>
-                        <div class="pillar-text">No genre tags. No mood labels. Pure dimensional psychology — Valence, Arousal, and real-time adaptive personalisation.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Auth Buttons -->
-            <div class="auth-section">
-                <div class="auth-heading">Continue with</div>
-                <div class="auth-buttons">
-                    <button class="auth-btn auth-btn-spotify" data-provider="spotify">
-                        <span class="auth-btn-icon">♫</span>
-                        <span class="auth-btn-label">Spotify</span>
-                    </button>
-                    <button class="auth-btn auth-btn-google" data-provider="google">
-                        <span class="auth-btn-icon">G</span>
-                        <span class="auth-btn-label">Google</span>
-                    </button>
-                    <button class="auth-btn auth-btn-github" data-provider="github">
-                        <span class="auth-btn-icon">⌘</span>
-                        <span class="auth-btn-label">GitHub</span>
-                    </button>
-                </div>
-                <div class="auth-divider">
-                    <span>or</span>
-                </div>
-                <button class="btn-guest" id="btn-guest">Continue as Guest →</button>
-            </div>
-
-            <div class="landing-cards">
-                <button class="mode-card active" id="card-linear" data-path="linear">
-                    <div class="card-index">01</div>
-                    <div class="card-title">Linear Chord</div>
-                    <div class="card-desc">Direct trajectory. Shortest path between emotional states. Efficient, purposeful.</div>
-                    <div class="card-select-indicator">SELECTED</div>
-                </button>
-                <button class="mode-card" id="card-creative" data-path="creative">
-                    <div class="card-index">02</div>
-                    <div class="card-title">Creative Arch</div>
-                    <div class="card-desc">Bezier arc. Gradual, immersive transition with emotional depth. Recommended.</div>
-                    <div class="card-select-indicator">SELECT</div>
-                </button>
-                <button class="mode-card" id="card-random" data-path="random">
-                    <div class="card-index">03</div>
-                    <div class="card-title">Exploration</div>
-                    <div class="card-desc">Stochastic perturbation. Discover unexpected transitions.</div>
-                    <div class="card-select-indicator">SELECT</div>
-                </button>
+        <main class="landing-center">
+            <div class="landing-block">
+                <p class="landing-tagline">Music charts a path through how you feel.</p>
+                <h1 class="landing-headline">Pick where you are.<br>Pick where you want to go.</h1>
+                <button class="landing-cta" id="btn-landing-start">Start your journey →</button>
             </div>
         </main>
 
-        <footer class="landing-footer">
-            <span>▲ Ascend uses Valence-Arousal dimensional psychology, not mood labels.</span>
-            <a href="https://findahelpline.com/" target="_blank" rel="noopener">Not a therapeutic tool.</a>
+        <footer class="landing-links">
+            <button class="landing-link" id="btn-show-how">How it works</button>
+            <span class="landing-link-sep">·</span>
+            <button class="landing-link" id="btn-show-why">Why it&rsquo;s different</button>
         </footer>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════
-         MOOD SELECTION SCREEN
-         ══════════════════════════════════════════════════════════ -->
+    <!-- ════════════════════════════════════════
+         HOW IT WORKS — overlay modal
+         ════════════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-how">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-wordmark">▲ ASCEND</span>
+                <button class="modal-close" id="modal-how-close">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-kicker">How it works</div>
+                <h2 class="modal-title">Three steps to a new emotional state.</h2>
+                <div class="modal-steps">
+                    <div class="modal-step">
+                        <span class="modal-step-num">01</span>
+                        <div>
+                            <strong>Set your coordinates.</strong>
+                            Click on the emotional plane to mark where you are now, then where you want to be.
+                        </div>
+                    </div>
+                    <div class="modal-step">
+                        <span class="modal-step-num">02</span>
+                        <div>
+                            <strong>The engine plots a path.</strong>
+                            Choose a trajectory mode — direct, curved, or exploratory. Ascend generates waypoints across Valence-Arousal space.
+                        </div>
+                    </div>
+                    <div class="modal-step">
+                        <span class="modal-step-num">03</span>
+                        <div>
+                            <strong>Tracks are matched by feeling.</strong>
+                            Each waypoint finds the closest song in emotional space. Listen, skip, or reshape — the path bends to you.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         WHY IT'S DIFFERENT — overlay modal
+         ════════════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-why">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-wordmark">▲ ASCEND</span>
+                <button class="modal-close" id="modal-why-close">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-kicker">Why it&rsquo;s different</div>
+                <h2 class="modal-title">Psychology, not tags.</h2>
+                <div class="modal-body-text">
+                    <p>
+                        Most music recommendation relies on genre labels or collaborative filtering.
+                        Ascend is rooted in <a href="https://www.researchgate.net/publication/235361517_A_circumplex_model_of_affect" target="_blank" rel="noopener noreferrer">the circumplex model of affect</a> —
+                        every track is scored on two continuous dimensions: <strong>Valence</strong> (pleasure) and <strong>Arousal</strong> (intensity).
+                    </p>
+                    <ul>
+                        <li>No mood labels. No &ldquo;Chill Vibes.&rdquo; No &ldquo;Happy Hits.&rdquo;</li>
+                        <li>No genre walls. A classical piece and an electronic track can sit side by side if their emotional signatures match.</li>
+                        <li>Adaptive feedback. Each session tunes the system to your unique perception.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         MOOD SELECTOR
+         ════════════════════════════════════════ -->
     <div class="screen" id="screen-select">
         <div class="select-layout">
-            <div class="select-sidebar">
-                <button class="back-btn" id="btn-back-landing">← Back</button>
-                <div class="select-brand">▲ ASCEND</div>
-                <div class="select-instruction">
-                    <div class="instruction-step" id="instruction-step">
-                        <span class="step-num">01</span>
-                        <span class="step-text">Click to place your <strong>current</strong> emotional state</span>
+            <aside class="select-sidebar">
+                <div class="select-top-row">
+                    <button class="back-btn" id="btn-back-landing">← Back</button>
+                    <span class="select-wordmark">▲ ASCEND</span>
+                    <button class="select-auth-btn" id="btn-select-auth">Sign in</button>
+                </div>
+
+                <div class="select-guide">
+                    <div class="guide-step" id="guide-step">
+                        <span class="guide-num">01</span>
+                        <span class="guide-text">Place your <strong>current</strong> state</span>
                     </div>
                 </div>
-                <div class="coord-readout" id="coord-readout">
-                    <div class="coord-item" id="coord-start">
-                        <div class="coord-label">START</div>
-                        <div class="coord-val" id="coord-start-val">—</div>
+
+                <div class="select-coords" id="select-coords">
+                    <div class="coord-col">
+                        <div class="coord-label">FROM</div>
+                        <div class="coord-value" id="coord-start-val">—</div>
                     </div>
-                    <div class="coord-divider">→</div>
-                    <div class="coord-item" id="coord-target">
-                        <div class="coord-label">TARGET</div>
-                        <div class="coord-val" id="coord-target-val">—</div>
+                    <div class="coord-arrow">→</div>
+                    <div class="coord-col">
+                        <div class="coord-label">TO</div>
+                        <div class="coord-value" id="coord-target-val">—</div>
                     </div>
                 </div>
-                <div class="settings-panel">
-                    <label class="setting-label">TRAJECTORY MODE</label>
-                    <div class="path-mode-display" id="path-mode-display">Linear Chord</div>
+
+                <div class="select-paths">
+                    <div class="select-paths-label">TRAJECTORY</div>
+                    <div class="path-toggles">
+                        <button class="path-toggle active" data-path="linear">Linear</button>
+                        <button class="path-toggle" data-path="creative">Curved</button>
+                        <button class="path-toggle" data-path="random">Explore</button>
+                    </div>
                 </div>
+
                 <button class="btn-generate" id="btn-generate" disabled>
                     Generate Journey →
                 </button>
-            </div>
+            </aside>
 
             <div class="canvas-area">
                 <div class="axis-labels">
@@ -145,44 +162,41 @@
         </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════
-         DASHBOARD SCREEN — Two-Panel
-         ══════════════════════════════════════════════════════════ -->
+    <!-- ════════════════════════════════════════
+         DASHBOARD
+         ════════════════════════════════════════ -->
     <div class="screen" id="screen-dashboard">
         <div class="dashboard-layout">
 
-            <!-- ── Mobile view toggle (hidden on desktop) ── -->
-            <div class="dashboard-toggle" id="dashboard-toggle">
-                <button class="toggle-btn active" data-view="chart">Chart</button>
-                <button class="toggle-btn" data-view="tracks">Tracks</button>
+            <div class="db-toggle" id="db-toggle">
+                <button class="db-toggle-btn active" data-view="chart">Chart</button>
+                <button class="db-toggle-btn" data-view="tracks">Tracks</button>
             </div>
 
-            <!-- ── Left Panel: Controls + Chart ── -->
-            <div class="panel panel-left" id="panel-left">
-                <div class="panel-header">
-                    <div class="panel-nav-row">
+            <div class="db-left" id="db-left">
+                <div class="db-header">
+                    <div class="db-header-row">
                         <button class="back-btn" id="btn-back-select">← New Journey</button>
-                        <div class="panel-brand">▲ ASCEND</div>
-                        <div class="user-profile" id="user-profile">
-                            <img class="user-avatar" id="user-avatar" src="" alt="" style="display:none">
-                            <span class="user-name" id="user-name"></span>
-                            <button class="btn-signout" id="btn-signout" style="display:none">Sign Out</button>
+                        <span class="db-wordmark">▲ ASCEND</span>
+                        <div class="db-user" id="db-user">
+                            <img class="db-avatar" id="db-avatar" src="" alt="" style="display:none">
+                            <span class="db-name" id="db-name"></span>
+                            <button class="db-signout" id="db-signout" style="display:none">Sign Out</button>
                         </div>
                     </div>
-                    <div class="panel-tabs-row">
-                        <button class="panel-tab-btn active" id="tab-chart" data-tab="chart">Chart</button>
-                        <button class="panel-tab-btn" id="tab-metrics" data-tab="metrics">Metrics</button>
-                        <button class="panel-tab-btn" id="tab-feedback" data-tab="feedback">Feedback</button>
-                        <button class="panel-tab-btn" id="tab-history" data-tab="history">History</button>
+                    <div class="db-tabs">
+                        <button class="db-tab active" data-tab="chart">Chart</button>
+                        <button class="db-tab" data-tab="metrics">Metrics</button>
+                        <button class="db-tab" data-tab="feedback">Feedback</button>
+                        <button class="db-tab" data-tab="history">History</button>
                     </div>
                 </div>
 
-                <!-- Tab: Chart -->
-                <div class="panel-tab active" id="tab-content-chart">
+                <div class="db-tab-content active" id="tab-content-chart">
                     <div class="va-chart-wrap">
                         <canvas id="va-canvas"></canvas>
                     </div>
-                    <div class="chart-drag-hint" id="chart-drag-hint">↕ Drag waypoint handles to reshape trajectory</div>
+                    <div class="chart-drag-hint" id="chart-drag-hint">↕ Drag waypoints to reshape</div>
                     <div class="chart-legend">
                         <span class="legend-item"><span class="legend-sq solid"></span> Track</span>
                         <span class="legend-item"><span class="legend-sq dashed"></span> Waypoint path</span>
@@ -191,21 +205,19 @@
                     <button class="btn-goto-tracks" id="btn-goto-tracks">Go to Tracks →</button>
                 </div>
 
-                <!-- Tab: Metrics -->
-                <div class="panel-tab" id="tab-content-metrics">
+                <div class="db-tab-content" id="tab-content-metrics">
                     <div class="metrics-grid" id="metrics-grid"></div>
                     <div class="metrics-explainer">
-                        <p><strong>Endpoint Accuracy</strong> — Distance of final track from target state (lower = better)</p>
-                        <p><strong>Smoothness</strong> — Mean step size between consecutive tracks in VA space</p>
-                        <p><strong>Max Jump</strong> — Largest single emotional leap in the sequence</p>
-                        <p><strong>ISO Compliance</strong> — First track within 0.20 of the start state</p>
-                        <p><strong>Genre Entropy</strong> — Diversity of genres (higher = more varied)</p>
+                        <p><strong>Endpoint Accuracy</strong> — Distance of final track from target</p>
+                        <p><strong>Smoothness</strong> — Mean step size between consecutive tracks</p>
+                        <p><strong>Max Jump</strong> — Largest single emotional leap</p>
+                        <p><strong>ISO Compliance</strong> — First track within 0.20 of start</p>
+                        <p><strong>Genre Entropy</strong> — Diversity of genres</p>
                     </div>
                 </div>
 
-                <!-- Tab: History -->
-                <div class="panel-tab" id="tab-content-history">
-                    <div class="history-pane" id="history-pane">
+                <div class="db-tab-content" id="tab-content-history">
+                    <div class="history-pane">
                         <div class="history-empty" id="history-empty">
                             <div class="history-empty-icon">◈</div>
                             <div class="history-empty-text">No saved journeys yet</div>
@@ -215,11 +227,10 @@
                     </div>
                 </div>
 
-                <!-- Tab: Feedback -->
-                <div class="panel-tab" id="tab-content-feedback">
+                <div class="db-tab-content" id="tab-content-feedback">
                     <div class="feedback-pane">
                         <h3 class="feedback-heading">Post-Session Self-Report</h3>
-                        <p class="feedback-sub">Rate your emotional state before and after listening. This data drives adaptive personalisation.</p>
+                        <p class="feedback-sub">Rate your emotional state before and after listening.</p>
                         <div class="sam-group">
                             <label>Before — Positivity (Valence)</label>
                             <div class="sam-scale" id="sam-pre-valence"></div>
@@ -252,20 +263,17 @@
                 </div>
             </div>
 
-            <!-- ── Right Panel: Tracklist + Spotify Player ── -->
-            <div class="panel panel-right" id="panel-right">
+            <div class="db-right" id="db-right">
                 <div class="tracklist-header" id="tracklist-header">
                     <div class="journey-label" id="journey-label">Emotional Journey</div>
                     <button class="btn-save-journey" id="btn-save-journey" title="Save this journey">Save</button>
                     <div class="track-count" id="track-count"></div>
                 </div>
-
                 <div class="tracklist-scroll" id="tracklist-scroll">
                     <div id="tracklist"></div>
                 </div>
             </div>
 
-            <!-- ── Floating Spotify Player Panel ── -->
             <div class="player-floating" id="player-floating">
                 <div class="player-floating-header">
                     <span class="player-floating-label">NOW PLAYING</span>
@@ -277,16 +285,7 @@
                         <div class="player-floating-placeholder-icon">♫</div>
                         <div class="player-floating-placeholder-text">Select a track to preview</div>
                     </div>
-                    <iframe
-                        id="player-floating-iframe"
-                        src=""
-                        width="100%"
-                        height="100%"
-                        frameborder="0"
-                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                        loading="lazy"
-                        style="display:none;"
-                    ></iframe>
+                    <iframe id="player-floating-iframe" src="" width="100%" height="100%" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" style="display:none;"></iframe>
                 </div>
             </div>
         </div>

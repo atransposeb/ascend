@@ -10,7 +10,8 @@ venv/
 .venv/
 
 # Data files
-data/
+emotional_music_transition_system_analysis.md
+implementation_plan.md
 
 # IDE
 .vscode/

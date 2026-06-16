@@ -1,8 +1,7 @@
 /**
  * app.js – Ascend frontend application.
- *
- * State machine: LANDING → SELECT → DASHBOARD
- * Auth: OAuth (Google, Spotify, GitHub) + Guest via JWT cookies.
+ * Flow: LANDING → SELECT → DASHBOARD
+ * Auth via small header button, modals for info.
  */
 
 (() => {
@@ -25,76 +24,63 @@
     }
 
     // ── Auth state ─────────────────────────────────────────────────────────
-    let currentUser   = null;   // {id, email, provider, name, avatar_url} | null
-    let isGuest       = false;
+    let currentUser = null;
+    let isGuest     = false;
 
     // ── Application state ──────────────────────────────────────────────────
-    let selectedPathType  = 'linear';
-    let startCoords       = null;
-    let targetCoords      = null;
-    let selectionPhase    = 'start';
-    let currentPlaylist   = null;
-    let samValues         = { preV: null, preA: null, postV: null, postA: null };
-    let activeTrackId     = null;
+    let selectedPathType = 'linear';
+    let startCoords      = null;
+    let targetCoords     = null;
+    let selectionPhase   = 'start';
+    let currentPlaylist  = null;
+    let samValues        = { preV: null, preA: null, postV: null, postA: null };
+    let activeTrackId    = null;
 
-    // Draggable waypoint state
-    let waypointsMutable  = [];
-    let draggingWpIdx     = null;
-    let isDragging        = false;
-    let dragMoved         = false;
+    let waypointsMutable = [];
+    let draggingWpIdx    = null;
+    let isDragging       = false;
+    let dragMoved        = false;
 
     // ── DOM refs ───────────────────────────────────────────────────────────
 
-    // Screens
     const $screenLanding   = document.getElementById('screen-landing');
     const $screenSelect    = document.getElementById('screen-select');
     const $screenDashboard = document.getElementById('screen-dashboard');
-
-    // Landing – auth
-    const authBtns         = document.querySelectorAll('.auth-btn');
-    const $btnGuest        = document.getElementById('btn-guest');
-
-    // Landing – path cards
-    const modeCards        = document.querySelectorAll('.mode-card');
 
     // Selection
     const $btnBackLanding  = document.getElementById('btn-back-landing');
     const $btnGenerate     = document.getElementById('btn-generate');
     const $selectorCanvas  = document.getElementById('mood-selector-canvas');
-    const $instructionStep = document.getElementById('instruction-step');
+    const $guideStep       = document.getElementById('guide-step');
     const $coordStartVal   = document.getElementById('coord-start-val');
     const $coordTargetVal  = document.getElementById('coord-target-val');
-    const $pathModeDisplay = document.getElementById('path-mode-display');
+    const pathToggles      = document.querySelectorAll('.path-toggle');
 
-    // Dashboard – left panel
+    // Dashboard
     const $btnBackSelect   = document.getElementById('btn-back-select');
     const $vaCanvas        = document.getElementById('va-canvas');
     const $metricsGrid     = document.getElementById('metrics-grid');
     const $chartDragHint   = document.getElementById('chart-drag-hint');
-    const tabBtns          = document.querySelectorAll('.panel-tab-btn');
-    const tabContents      = document.querySelectorAll('.panel-tab');
+    const $dbTabs          = document.querySelectorAll('.db-tab');
+    const $dbTabContents   = document.querySelectorAll('.db-tab-content');
+    const $dbUser          = document.getElementById('db-user');
+    const $dbAvatar        = document.getElementById('db-avatar');
+    const $dbName          = document.getElementById('db-name');
+    const $dbSignout       = document.getElementById('db-signout');
+    const $dbToggle        = document.getElementById('db-toggle');
+    const $dbToggleBtns    = document.querySelectorAll('.db-toggle-btn');
 
-    // Dashboard – user profile
-    const $userProfile     = document.getElementById('user-profile');
-    const $userAvatar      = document.getElementById('user-avatar');
-    const $userName        = document.getElementById('user-name');
-    const $btnSignout      = document.getElementById('btn-signout');
-
-    // Dashboard – mobile view toggle
-    const $dashboardToggle = document.getElementById('dashboard-toggle');
-    const toggleBtns       = document.querySelectorAll('.toggle-btn');
-
-    // Dashboard – right panel
+    // Tracklist
     const $tracklist       = document.getElementById('tracklist');
     const $journeyLabel    = document.getElementById('journey-label');
     const $trackCount      = document.getElementById('track-count');
     const $btnSaveJourney  = document.getElementById('btn-save-journey');
 
-    // Floating player panel
-    const $playerFloating     = document.getElementById('player-floating');
-    const $playerFloatingTrack= document.getElementById('player-floating-track');
-    const $playerFloatingClose= document.getElementById('player-floating-close');
-    const $playerFloatingIframe   = document.getElementById('player-floating-iframe');
+    // Player
+    const $playerFloating          = document.getElementById('player-floating');
+    const $playerFloatingTrack     = document.getElementById('player-floating-track');
+    const $playerFloatingClose     = document.getElementById('player-floating-close');
+    const $playerFloatingIframe    = document.getElementById('player-floating-iframe');
     const $playerFloatingPlaceholder = document.getElementById('player-floating-placeholder');
 
     // History
@@ -102,22 +88,57 @@
     const $historyEmpty  = document.getElementById('history-empty');
 
     // Feedback
-    const $btnSkipFeedback = document.getElementById('btn-skip-feedback');
+    const $btnSkipFeedback   = document.getElementById('btn-skip-feedback');
     const $btnSubmitFeedback = document.getElementById('btn-submit-feedback');
-    const $feedbackResult  = document.getElementById('feedback-result');
-    const $resultDeltas    = document.getElementById('result-deltas');
+    const $feedbackResult    = document.getElementById('feedback-result');
+    const $resultDeltas      = document.getElementById('result-deltas');
 
     // Loader
-    const $loader          = document.getElementById('loader');
+    const $loader = document.getElementById('loader');
+
+    // Modals
+    const $modalHow  = document.getElementById('modal-how');
+    const $modalWhy  = document.getElementById('modal-why');
 
     // ── Path type names ────────────────────────────────────────────────────
     const PATH_NAMES = {
-        linear: 'Linear Chord',
-        creative: 'Creative Arch',
-        random: 'Exploration',
+        linear: 'Linear',
+        creative: 'Curved',
+        random: 'Explore',
     };
 
-    // ── Auth helpers ──────────────────────────────────────────────────────
+    // ── Screen management ──────────────────────────────────────────────────
+
+    function showScreen(id) {
+        [$screenLanding, $screenSelect, $screenDashboard].forEach(el => {
+            el.classList.toggle('active', el.id === id);
+        });
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    function proceedToSelection() {
+        showScreen('screen-select');
+        setTimeout(drawMoodSelector, 100);
+    }
+
+    // ── Landing ────────────────────────────────────────────────────────────
+
+    document.getElementById('btn-landing-start').addEventListener('click', proceedToSelection);
+
+    // ── Modals ─────────────────────────────────────────────────────────────
+
+    function openModal(el) { if (el) el.classList.add('active'); }
+    function closeModal(el) { if (el) el.classList.remove('active'); }
+
+    document.getElementById('btn-show-how').addEventListener('click', () => openModal($modalHow));
+    document.getElementById('modal-how-close').addEventListener('click', () => closeModal($modalHow));
+    document.getElementById('btn-show-why').addEventListener('click', () => openModal($modalWhy));
+    document.getElementById('modal-why-close').addEventListener('click', () => closeModal($modalWhy));
+
+    $modalHow.addEventListener('click', e => { if (e.target === $modalHow) closeModal($modalHow); });
+    $modalWhy.addEventListener('click', e => { if (e.target === $modalWhy) closeModal($modalWhy); });
+
+    // ── Auth ───────────────────────────────────────────────────────────────
 
     async function checkAuth() {
         try {
@@ -137,32 +158,20 @@
     function renderUserProfile() {
         if (currentUser) {
             if (currentUser.avatar_url) {
-                $userAvatar.src = currentUser.avatar_url;
-                $userAvatar.style.display = 'inline-block';
+                $dbAvatar.src = currentUser.avatar_url;
+                $dbAvatar.style.display = 'inline-block';
             }
-            $userName.textContent = currentUser.name || currentUser.email || currentUser.provider;
-            $btnSignout.style.display = 'inline-block';
+            $dbName.textContent = currentUser.name || currentUser.email || currentUser.provider;
+            $dbSignout.style.display = 'inline-block';
         } else {
-            $userAvatar.style.display = 'none';
-            $userName.textContent = '';
-            $btnSignout.style.display = 'none';
-        }
-    }
-
-    async function handleGuestLogin() {
-        try {
-            await api('/auth/guest', { method: 'POST' });
-            await checkAuth();
-            proceedToSelection();
-        } catch (err) {
-            alert(`Guest login failed: ${err.message}`);
+            $dbAvatar.style.display = 'none';
+            $dbName.textContent = '';
+            $dbSignout.style.display = 'none';
         }
     }
 
     async function handleSignOut() {
-        try {
-            await api('/auth/logout', { method: 'POST' });
-        } catch (_) {}
+        try { await api('/auth/logout', { method: 'POST' }); } catch (_) {}
         currentUser = null;
         isGuest = false;
         renderUserProfile();
@@ -173,22 +182,10 @@
         window.location.href = `/auth/login/${provider}`;
     }
 
-    // ── Screen management ──────────────────────────────────────────────────
+    document.getElementById('btn-select-auth').addEventListener('click', () => handleOAuthClick('google'));
+    $dbSignout.addEventListener('click', handleSignOut);
 
-    function showScreen(id) {
-        [$screenLanding, $screenSelect, $screenDashboard].forEach(el => {
-            el.classList.toggle('active', el.id === id);
-        });
-        window.scrollTo({ top: 0, behavior: 'instant' });
-    }
-
-    function proceedToSelection() {
-        $pathModeDisplay.textContent = PATH_NAMES[selectedPathType];
-        showScreen('screen-select');
-        setTimeout(drawMoodSelector, 100);
-    }
-
-    // ── URL param check for OAuth callback ────────────────────────────────
+    // ── URL param check ────────────────────────────────────────────────────
 
     async function handlePostLogin() {
         const params = new URLSearchParams(window.location.search);
@@ -203,29 +200,15 @@
         await checkAuth();
     }
 
-    // ── Landing interactions ───────────────────────────────────────────────
+    // ── Path toggles ──────────────────────────────────────────────────────
 
-    authBtns.forEach(btn => {
+    pathToggles.forEach(btn => {
         btn.addEventListener('click', () => {
-            handleOAuthClick(btn.dataset.provider);
+            pathToggles.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedPathType = btn.dataset.path;
         });
     });
-
-    $btnGuest.addEventListener('click', handleGuestLogin);
-
-    modeCards.forEach(card => {
-        card.addEventListener('click', () => {
-            modeCards.forEach(c => {
-                c.classList.remove('active');
-                c.querySelector('.card-select-indicator').textContent = 'SELECT';
-            });
-            card.classList.add('active');
-            card.querySelector('.card-select-indicator').textContent = 'SELECTED';
-            selectedPathType = card.dataset.path;
-        });
-    });
-
-    $btnSignout.addEventListener('click', handleSignOut);
 
     // ── Mood Selector Canvas ───────────────────────────────────────────────
 
@@ -248,9 +231,9 @@
             startCoords = { v, a };
             targetCoords = null;
             selectionPhase = 'target';
-            $instructionStep.innerHTML = `
-                <span class="step-num">02</span>
-                <span class="step-text">Now click to place your <strong>target</strong> emotional state</span>
+            $guideStep.innerHTML = `
+                <span class="guide-num">02</span>
+                <span class="guide-text">Now place your <strong>target</strong> state</span>
             `;
             $coordStartVal.textContent = fmtCoord(v, a);
             $coordTargetVal.textContent = '—';
@@ -258,9 +241,9 @@
         } else {
             targetCoords = { v, a };
             selectionPhase = 'start';
-            $instructionStep.innerHTML = `
-                <span class="step-num">✓</span>
-                <span class="step-text">Both states placed. Click <strong>Generate</strong> to begin, or re-click to adjust.</span>
+            $guideStep.innerHTML = `
+                <span class="guide-num">✓</span>
+                <span class="guide-text">Both placed. Click <strong>Generate</strong>, or click again to adjust.</span>
             `;
             $coordTargetVal.textContent = fmtCoord(v, a);
             $btnGenerate.disabled = false;
@@ -652,7 +635,7 @@
         const { playlist, waypoints } = currentPlaylist;
 
         $journeyLabel.textContent = `${playlist.length} tracks`;
-        $trackCount.textContent   = `${PATH_NAMES[selectedPathType] || 'Journey'} · DRAG HANDLES TO RESHAPE`;
+        $trackCount.textContent   = `${PATH_NAMES[selectedPathType] || 'Journey'} · Drag to reshape`;
 
         $tracklist.innerHTML = '';
         let lastWp = -1;
@@ -960,9 +943,7 @@
         }
     }
 
-    function renderHistory() {
-        loadHistory();
-    }
+    function renderHistory() { loadHistory(); }
 
     function renderHistoryList(journeys) {
         $historyList.innerHTML = '';
@@ -1021,11 +1002,7 @@
         }
 
         let waypoints;
-        try {
-            waypoints = JSON.parse(journey.waypoints_json || '[]');
-        } catch (_) {
-            waypoints = [];
-        }
+        try { waypoints = JSON.parse(journey.waypoints_json || '[]'); } catch (_) { waypoints = []; }
 
         if (waypoints.length > 1) {
             ctx.strokeStyle = 'rgba(0,0,0,0.2)';
@@ -1077,31 +1054,27 @@
     // ── Tab management ─────────────────────────────────────────────────────
 
     function switchTab(tabName) {
-        tabBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabName));
-        tabContents.forEach(el => el.classList.toggle('active', el.id === `tab-content-${tabName}`));
-        if (tabName === 'chart') {
-            requestAnimationFrame(() => renderVAChart());
-        }
-        if (tabName === 'history') {
-            renderHistory();
-        }
+        $dbTabs.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabName));
+        $dbTabContents.forEach(el => el.classList.toggle('active', el.id === `tab-content-${tabName}`));
+        if (tabName === 'chart') { requestAnimationFrame(() => renderVAChart()); }
+        if (tabName === 'history') { renderHistory(); }
     }
 
-    tabBtns.forEach(btn => {
+    $dbTabs.forEach(btn => {
         btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
 
     // ── Mobile view toggle ──────────────────────────────────────────────────
 
     function switchMobileView(view) {
-        if (!$dashboardToggle) return;
-        toggleBtns.forEach(b => b.classList.toggle('active', b.dataset.view === view));
-        $dashboardToggle.classList.remove('view-chart', 'view-tracks');
-        $dashboardToggle.classList.add(`view-${view}`);
+        if (!$dbToggle) return;
+        $dbToggleBtns.forEach(b => b.classList.toggle('active', b.dataset.view === view));
+        $dbToggle.classList.remove('view-chart', 'view-tracks');
+        $dbToggle.classList.add(`view-${view}`);
         if (view === 'chart') requestAnimationFrame(renderVAChart);
     }
 
-    toggleBtns.forEach(btn => {
+    $dbToggleBtns.forEach(btn => {
         btn.addEventListener('click', () => switchMobileView(btn.dataset.view));
     });
 
@@ -1190,9 +1163,9 @@
         startCoords   = null;
         targetCoords  = null;
         selectionPhase = 'start';
-        $instructionStep.innerHTML = `
-            <span class="step-num">01</span>
-            <span class="step-text">Click to place your <strong>current</strong> emotional state</span>
+        $guideStep.innerHTML = `
+            <span class="guide-num">01</span>
+            <span class="guide-text">Place your <strong>current</strong> state</span>
         `;
         $coordStartVal.textContent  = '—';
         $coordTargetVal.textContent = '—';
@@ -1216,11 +1189,9 @@
 
     $btnGenerate.addEventListener('click', generatePlaylist);
     $btnSubmitFeedback.addEventListener('click', submitFeedback);
-    $btnSkipFeedback.addEventListener('click', () => {
-        switchTab('chart');
-    });
+    $btnSkipFeedback.addEventListener('click', () => { switchTab('chart'); });
 
-    // ── Resize handler ─────────────────────────────────────────────────────
+    // ── Resize ─────────────────────────────────────────────────────────────
 
     window.addEventListener('resize', () => {
         drawMoodSelector();

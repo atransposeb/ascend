@@ -1,0 +1,19 @@
+{
+  "total_tracks": 89726,
+  "unique_artists": 31435,
+  "unique_genres": 114,
+  "valence_range": [
+    0.0,
+    0.995
+  ],
+  "energy_range": [
+    0.0,
+    1.0
+  ],
+  "quadrant_distribution": {
+    "1": 33220,
+    "2": 30208,
+    "3": 19021,
+    "4": 7277
+  }
+}
